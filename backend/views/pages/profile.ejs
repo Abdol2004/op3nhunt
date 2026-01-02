@@ -2,68 +2,739 @@
 
 <div class="profile-page">
   <div class="container">
-    <h1>Your Profile</h1>
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-circle">
+          <%= user.username.substring(0, 2).toUpperCase() %>
+        </div>
+        <% if (user.isActivePremium()) { %>
+          <div class="premium-crown">👑</div>
+        <% } %>
+      </div>
+      <div class="profile-title">
+        <h1><%= user.username %></h1>
+        <p class="profile-subtitle"><%= user.email %></p>
+        <% if (user.isActivePremium()) { %>
+          <span class="status-badge premium">👑 Premium Member</span>
+        <% } else { %>
+          <span class="status-badge free">Free Member</span>
+        <% } %>
+      </div>
+    </div>
     
-    <div class="profile-grid">
-      <div class="profile-card">
-        <h2>Account Details</h2>
-        <div class="profile-info">
-          <div class="info-row">
-            <span class="label">Username:</span>
-            <span class="value"><%= user.username %></span>
+    <!-- Quick Stats Row -->
+    <div class="quick-stats">
+      <div class="quick-stat-card">
+        <div class="quick-stat-icon">💾</div>
+        <div class="quick-stat-number"><%= user.savedGigs.length %></div>
+        <div class="quick-stat-label">Saved Gigs</div>
+      </div>
+      <div class="quick-stat-card">
+        <div class="quick-stat-icon">✅</div>
+        <div class="quick-stat-number"><%= user.savedGigs.filter(g => g.status === 'applied').length %></div>
+        <div class="quick-stat-label">Applied</div>
+      </div>
+      <div class="quick-stat-card">
+        <div class="quick-stat-icon">👀</div>
+        <div class="quick-stat-number"><%= user.dailyGigsViewed %></div>
+        <div class="quick-stat-label">Viewed Today</div>
+      </div>
+      <div class="quick-stat-card">
+        <div class="quick-stat-icon">🎯</div>
+        <div class="quick-stat-number"><%= user.isActivePremium() ? '∞' : '20' %></div>
+        <div class="quick-stat-label">Daily Limit</div>
+      </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="profile-content-grid">
+      <!-- Account Details -->
+      <div class="profile-section">
+        <div class="section-header">
+          <h2>📋 Account Details</h2>
+        </div>
+        <div class="detail-list">
+          <div class="detail-item">
+            <div class="detail-label">Username</div>
+            <div class="detail-value"><%= user.username %></div>
           </div>
-          <div class="info-row">
-            <span class="label">Email:</span>
-            <span class="value"><%= user.email %></span>
+          <div class="detail-item">
+            <div class="detail-label">Email Address</div>
+            <div class="detail-value"><%= user.email %></div>
           </div>
-          <div class="info-row">
-            <span class="label">Status:</span>
-            <span class="value">
+          <div class="detail-item">
+            <div class="detail-label">Account Type</div>
+            <div class="detail-value">
               <% if (user.isActivePremium()) { %>
-                <span class="badge badge-premium">👑 Premium</span>
+                <span class="inline-badge premium">👑 Premium</span>
               <% } else { %>
-                <span class="badge badge-free">Free</span>
+                <span class="inline-badge free">Free</span>
               <% } %>
-            </span>
+            </div>
           </div>
-          <div class="info-row">
-            <span class="label">Member Since:</span>
-            <span class="value"><%= new Date(user.createdAt).toLocaleDateString() %></span>
+          <div class="detail-item">
+            <div class="detail-label">Member Since</div>
+            <div class="detail-value"><%= new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></div>
           </div>
+          <% if (user.isActivePremium() && user.premiumUntil) { %>
+            <div class="detail-item">
+              <div class="detail-label">Premium Until</div>
+              <div class="detail-value"><%= new Date(user.premiumUntil).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></div>
+            </div>
+          <% } %>
         </div>
       </div>
       
-      <div class="profile-card">
-        <h2>Statistics</h2>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-number"><%= user.savedGigs.length %></div>
-            <div class="stat-label">Saved Gigs</div>
+      <!-- Activity Stats -->
+      <div class="profile-section">
+        <div class="section-header">
+          <h2>📊 Your Activity</h2>
+        </div>
+        <div class="activity-stats">
+          <div class="activity-stat-row">
+            <div class="activity-icon saved">💾</div>
+            <div class="activity-info">
+              <div class="activity-number"><%= user.savedGigs.length %></div>
+              <div class="activity-text">Gigs Saved</div>
+            </div>
+            <div class="activity-bar">
+              <div class="activity-bar-fill" style="width: <%= Math.min(100, (user.savedGigs.length / 50) * 100) %>%"></div>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="stat-number"><%= user.savedGigs.filter(g => g.status === 'applied').length %></div>
-            <div class="stat-label">Applied</div>
+          
+          <div class="activity-stat-row">
+            <div class="activity-icon applied">✅</div>
+            <div class="activity-info">
+              <div class="activity-number"><%= user.savedGigs.filter(g => g.status === 'applied').length %></div>
+              <div class="activity-text">Applications</div>
+            </div>
+            <div class="activity-bar">
+              <div class="activity-bar-fill applied" style="width: <%= user.savedGigs.length > 0 ? (user.savedGigs.filter(g => g.status === 'applied').length / user.savedGigs.length) * 100 : 0 %>%"></div>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="stat-number"><%= user.dailyGigsViewed %></div>
-            <div class="stat-label">Viewed Today</div>
+          
+          <div class="activity-stat-row">
+            <div class="activity-icon viewed">👀</div>
+            <div class="activity-info">
+              <div class="activity-number"><%= user.dailyGigsViewed %></div>
+              <div class="activity-text">Viewed Today</div>
+            </div>
+            <div class="activity-bar">
+              <div class="activity-bar-fill viewed" style="width: <%= user.isActivePremium() ? 100 : (user.dailyGigsViewed / 20) * 100 %>%"></div>
+            </div>
           </div>
-          <div class="stat-box">
-            <div class="stat-number"><%= user.isActivePremium() ? '∞' : '20' %></div>
-            <div class="stat-label">Daily Limit</div>
-          </div>
+          
+          <% if (!user.isActivePremium()) { %>
+            <div class="activity-limit-info">
+              <div class="limit-text">
+                <strong><%= 20 - user.dailyGigsViewed %></strong> gigs remaining today
+              </div>
+              <a href="/premium" class="upgrade-link">Upgrade for Unlimited →</a>
+            </div>
+          <% } %>
         </div>
       </div>
     </div>
     
+    <!-- Upgrade Banner (if not premium) -->
     <% if (!user.isActivePremium()) { %>
-      <div class="upgrade-banner">
-        <h3>🚀 Upgrade to Premium</h3>
-        <p>Get unlimited gigs, advanced filters, and priority support for just $5/month</p>
-        <a href="/premium" class="btn-primary">Learn More</a>
+      <div class="premium-cta-banner">
+        <div class="premium-cta-content">
+          <div class="premium-cta-icon">👑</div>
+          <div class="premium-cta-text">
+            <h3>Unlock Premium Features</h3>
+            <p>Get unlimited gigs, Telegram alerts, and priority support for just $5/month</p>
+          </div>
+          <a href="/premium" class="btn-premium-large">
+            <span>Upgrade to Premium</span>
+            <span class="btn-arrow">→</span>
+          </a>
+        </div>
+        <div class="premium-features-mini">
+          <div class="mini-feature">✅ Unlimited Gigs</div>
+          <div class="mini-feature">✅ Telegram Alerts</div>
+          <div class="mini-feature">✅ Advanced Filters</div>
+          <div class="mini-feature">✅ Priority Support</div>
+        </div>
+      </div>
+    <% } else { %>
+      <!-- Premium Perks Display -->
+      <div class="premium-active-banner">
+        <div class="premium-active-content">
+          <div class="premium-active-icon">🎉</div>
+          <div class="premium-active-text">
+            <h3>You're a Premium Member!</h3>
+            <p>Enjoy unlimited access to all features</p>
+          </div>
+        </div>
+        <div class="premium-active-features">
+          <div class="active-feature">✅ Unlimited Gigs</div>
+          <div class="active-feature">✅ Telegram Alerts Active</div>
+          <div class="active-feature">✅ Advanced Filters</div>
+          <div class="active-feature">✅ Priority Support</div>
+        </div>
       </div>
     <% } %>
+    
   </div>
 </div>
+
+<style>
+/* Profile Page Specific Styles */
+.profile-page {
+  min-height: calc(100vh - 200px);
+  padding: 3rem 0;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 212, 255, 0.05) 100%);
+  border-radius: 25px;
+  border: 2px solid rgba(0, 255, 136, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+  animation: profileGlow 8s ease-in-out infinite;
+}
+
+@keyframes profileGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-20px, -20px) scale(1.1); }
+}
+
+.profile-avatar {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.avatar-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #000;
+  box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4);
+  border: 4px solid rgba(0, 0, 0, 0.3);
+}
+
+.premium-crown {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 2.5rem;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  animation: crownFloat 3s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.profile-title {
+  flex: 1;
+  z-index: 1;
+}
+
+.profile-title h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.profile-subtitle {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-badge.premium {
+  background: linear-gradient(135deg, #ff0080 0%, #ff8800 100%);
+  color: white;
+  box-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+}
+
+.status-badge.free {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Quick Stats Row */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.quick-stat-card {
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 255, 136, 0.2);
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.quick-stat-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3);
+}
+
+.quick-stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 20px var(--primary-glow));
+}
+
+.quick-stat-number {
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.quick-stat-label {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* Profile Content Grid */
+.profile-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.profile-section {
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  border: 2px solid rgba(0, 255, 136, 0.2);
+  overflow: hidden;
+}
+
+.section-header {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid rgba(0, 255, 136, 0.2);
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.detail-list {
+  padding: 2rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.inline-badge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inline-badge.premium {
+  background: linear-gradient(135deg, #ff0080 0%, #ff8800 100%);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.4);
+}
+
+.inline-badge.free {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+}
+
+/* Activity Stats */
+.activity-stats {
+  padding: 2rem;
+}
+
+.activity-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.activity-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.activity-icon.saved {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 212, 255, 0.2) 100%);
+  border: 2px solid var(--primary);
+}
+
+.activity-icon.applied {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
+  border: 2px solid var(--success);
+}
+
+.activity-icon.viewed {
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.2) 0%, rgba(255, 136, 0, 0.2) 100%);
+  border: 2px solid var(--warning);
+}
+
+.activity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-number {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.activity-text {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.activity-bar {
+  flex: 2;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.activity-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.activity-bar-fill.applied {
+  background: linear-gradient(90deg, var(--success) 0%, #10b981 100%);
+}
+
+.activity-bar-fill.viewed {
+  background: linear-gradient(90deg, var(--warning) 0%, #ff8800 100%);
+}
+
+.activity-limit-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 170, 0, 0.1);
+  border: 2px solid var(--warning);
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.limit-text {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.upgrade-link {
+  color: var(--warning);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+}
+
+.upgrade-link:hover {
+  color: #ff8800;
+  text-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
+}
+
+/* Premium CTA Banner */
+.premium-cta-banner {
+  background: linear-gradient(135deg, rgba(255, 0, 128, 0.1) 0%, rgba(255, 136, 0, 0.1) 100%);
+  border: 2px solid rgba(255, 0, 128, 0.3);
+  border-radius: 25px;
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-cta-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 0, 128, 0.2) 0%, transparent 70%);
+  animation: premiumBannerGlow 6s ease-in-out infinite;
+}
+
+@keyframes premiumBannerGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(30px, 30px) scale(1.2); opacity: 0.8; }
+}
+
+.premium-cta-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+.premium-cta-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 30px rgba(255, 0, 128, 0.8));
+}
+
+.premium-cta-text {
+  flex: 1;
+  min-width: 250px;
+}
+
+.premium-cta-text h3 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #ff0080 0%, #ff8800 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.premium-cta-text p {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+}
+
+.btn-premium-large {
+  background: linear-gradient(135deg, #ff0080 0%, #ff8800 100%);
+  color: white;
+  padding: 1.25rem 2.5rem;
+  border-radius: 15px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 0 40px rgba(255, 0, 128, 0.5);
+  transition: all 0.3s;
+}
+
+.btn-premium-large:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 60px rgba(255, 0, 128, 0.8);
+}
+
+.btn-arrow {
+  font-size: 1.5rem;
+  transition: transform 0.3s;
+}
+
+.btn-premium-large:hover .btn-arrow {
+  transform: translateX(5px);
+}
+
+.premium-features-mini {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.mini-feature {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 0, 128, 0.2);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Premium Active Banner */
+.premium-active-banner {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+  border: 2px solid var(--primary);
+  border-radius: 25px;
+  padding: 3rem 2.5rem;
+}
+
+.premium-active-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.premium-active-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 30px var(--primary-glow));
+}
+
+.premium-active-text h3 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.premium-active-text p {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+}
+
+.premium-active-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.active-feature {
+  padding: 1rem;
+  background: rgba(0, 255, 136, 0.05);
+  border-radius: 12px;
+  border: 1px solid var(--primary);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .avatar-circle {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
+  }
+  
+  .quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .activity-stat-row {
+    flex-wrap: wrap;
+  }
+  
+  .activity-bar {
+    width: 100%;
+    flex: none;
+  }
+  
+  .premium-cta-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .btn-premium-large {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 
 <%- include('../partials/footer') %>
