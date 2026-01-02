@@ -1,0 +1,110 @@
+<%- include('../partials/header', { title: 'Premium' }) %>
+
+<div class="premium-page">
+  <div class="container">
+    <div class="premium-hero">
+      <h1>Upgrade to <span class="gradient-text">Premium</span></h1>
+      <p class="premium-subtitle">Unlimited gigs, advanced features, priority support</p>
+      <div class="premium-price">
+        <span class="price-amount">$5</span>
+        <span class="price-period">/month</span>
+      </div>
+    </div>
+    
+    <div class="premium-comparison">
+      <div class="comparison-col">
+        <h3>Free</h3>
+        <ul>
+          <li>✅ 20 gigs per day</li>
+          <li>✅ Save & track gigs</li>
+          <li>✅ Basic filters</li>
+          <li>❌ Advanced filters</li>
+          <li>❌ Email alerts</li>
+          <li>❌ Priority support</li>
+        </ul>
+      </div>
+      
+      <div class="comparison-col featured">
+        <div class="badge">Premium</div>
+        <h3>Premium</h3>
+        <ul>
+          <li>✅ <strong>Unlimited gigs</strong></li>
+          <li>✅ Save & track gigs</li>
+          <li>✅ Basic filters</li>
+          <li>✅ <strong>Advanced filters</strong></li>
+          <li>✅ <strong>Email alerts</strong></li>
+          <li>✅ <strong>Priority support</strong></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="premium-benefits">
+      <h2>Premium Benefits</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">♾️</div>
+          <h3>Unlimited Gigs</h3>
+          <p>View as many opportunities as you want. No daily limits.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🔍</div>
+          <h3>Advanced Filters</h3>
+          <p>Filter by category, score, engagement, and more.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📧</div>
+          <h3>Email Alerts</h3>
+          <p>Get notified when high-scoring gigs are found.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">⚡</div>
+          <h3>Priority Support</h3>
+          <p>Direct access to our team for help and feedback.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="premium-cta">
+      <h2>How to Upgrade</h2>
+      <div class="upgrade-steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Message on Telegram</h3>
+            <p>Send a message to <strong>@<%= process.env.TELEGRAM_USERNAME || 'beebrain123' %></strong></p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Provide Details</h3>
+            <p>Include: Your username (<strong><%= user ? user.username : 'username' %></strong>), email, and payment method</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Send Payment</h3>
+            <p>$5 via PayPal, Crypto, or your preferred method</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Get Upgraded</h3>
+            <p>We'll activate Premium within 24 hours</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="telegram-cta">
+        <a href="https://t.me/<%= process.env.TELEGRAM_USERNAME || 'beebrain123' %>" target="_blank" class="btn-large btn-primary">
+          💬 Message on Telegram
+        </a>
+        <p class="text-muted">Or send your details directly in the Telegram app</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

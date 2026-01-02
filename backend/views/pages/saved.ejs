@@ -1,0 +1,72 @@
+<%- include('../partials/header', { title: 'Saved Gigs' }) %>
+
+<div class="saved-page">
+  <div class="container">
+    <h1>Your Saved Gigs</h1>
+    <p class="subtitle">Track your saved opportunities and applications</p>
+    
+    <% if (gigs.length === 0) { %>
+      <div class="no-gigs">
+        <h2>No Saved Gigs Yet</h2>
+        <p>Start saving gigs from your dashboard to track them here.</p>
+        <a href="/dashboard" class="btn-primary">Go to Dashboard</a>
+      </div>
+    <% } else { %>
+      <div class="gigs-grid">
+        <% gigs.forEach(gig => { %>
+          <div class="gig-card">
+            <div class="gig-header">
+              <div class="gig-author">
+                <strong>@<%= gig.author.username %></strong>
+                <% if (gig.author.verified) { %>
+                  <span class="verified">✓</span>
+                <% } %>
+              </div>
+              <div class="gig-status">
+                <% if (gig.userStatus === 'applied') { %>
+                  <span class="badge badge-success">✅ Applied</span>
+                <% } else if (gig.userStatus === 'ignored') { %>
+                  <span class="badge badge-muted">Ignored</span>
+                <% } else { %>
+                  <span class="badge badge-info">💾 Saved</span>
+                <% } %>
+              </div>
+            </div>
+            
+            <p class="gig-text"><%= gig.text.substring(0, 200) %><%= gig.text.length > 200 ? '...' : '' %></p>
+            
+            <div class="gig-meta">
+              <span>❤️ <%= gig.engagement.likes %></span>
+              <span>🔄 <%= gig.engagement.retweets %></span>
+              <span>💬 <%= gig.engagement.replies %></span>
+              <span>Score: <%= gig.score %>/100</span>
+            </div>
+            
+            <div class="gig-actions">
+              <a href="<%= gig.url %>" target="_blank" class="btn-primary">View on X</a>
+              <% if (gig.userStatus !== 'applied') { %>
+                <button onclick="markApplied('<%= gig.tweetId %>')" class="btn-success">✅ Mark Applied</button>
+              <% } %>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+function markApplied(gigId) {
+  fetch('/gigs/status/' + gigId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'applied' })
+  })
+  .then(r => r.json())
+  .then(data => {
+    location.reload();
+  });
+}
+</script>
+
+<%- include('../partials/footer') %>

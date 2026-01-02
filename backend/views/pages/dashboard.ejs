@@ -1,0 +1,104 @@
+<%- include('../partials/header', { title: 'Dashboard' }) %>
+
+<div class="dashboard">
+  <div class="container">
+    <div class="dashboard-header">
+      <div>
+        <h1>Your Opportunities</h1>
+        <p>Latest Web3 Ambassador gigs, scored by AI</p>
+      </div>
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-value"><%= stats.dailyViewed || 0 %></div>
+          <div class="stat-label">Viewed Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= stats.dailyLimit %></div>
+          <div class="stat-label">Daily Limit</div>
+        </div>
+        <% if (!stats.isPremium) { %>
+          <a href="/premium" class="btn-primary">⭐ Upgrade</a>
+        <% } %>
+      </div>
+    </div>
+    
+    <% if (limitReached) { %>
+      <div class="limit-reached">
+        <h2>Daily Limit Reached 📊</h2>
+        <p>You've viewed your 20 gigs for today. Come back tomorrow or upgrade to Premium for unlimited access!</p>
+        <a href="/premium" class="btn-primary">Upgrade to Premium ($5/month)</a>
+      </div>
+    <% } else if (gigs.length === 0) { %>
+      <div class="no-gigs">
+        <h2>No Gigs Found Yet 🔍</h2>
+        <p>Our bot is searching X every 10 minutes. New gigs will appear here soon!</p>
+        <p class="text-muted">Next scan in a few minutes...</p>
+      </div>
+    <% } else { %>
+      <div class="gigs-grid">
+        <% gigs.forEach(gig => { %>
+          <div class="gig-card">
+            <div class="gig-header">
+              <div class="gig-author">
+                <strong>@<%= gig.author.username %></strong>
+                <% if (gig.author.verified) { %>
+                  <span class="verified">✓</span>
+                <% } %>
+              </div>
+              <div class="gig-score score-<%= gig.score >= 80 ? 'high' : gig.score >= 60 ? 'medium' : 'low' %>">
+                <%= gig.score %>/100
+              </div>
+            </div>
+            
+            <p class="gig-text"><%= gig.text.substring(0, 200) %><%= gig.text.length > 200 ? '...' : '' %></p>
+            
+            <div class="gig-meta">
+              <span>❤️ <%= gig.engagement.likes %></span>
+              <span>🔄 <%= gig.engagement.retweets %></span>
+              <span>💬 <%= gig.engagement.replies %></span>
+              <% if (gig.links && gig.links.length > 0) { %>
+                <span>🔗 Application Link</span>
+              <% } %>
+            </div>
+            
+            <div class="gig-actions">
+              <a href="<%= gig.url %>" target="_blank" class="btn-primary">View on X</a>
+              <button onclick="saveGig('<%= gig.tweetId %>')" class="btn-secondary">💾 Save</button>
+              <button onclick="markApplied('<%= gig.tweetId %>')" class="btn-success">✅ Applied</button>
+            </div>
+            
+            <div class="gig-time">
+              <%= new Date(gig.timestamp).toLocaleString() %>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+function saveGig(gigId) {
+  fetch('/gigs/save/' + gigId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      alert('Gig saved! View in Saved section.');
+    })
+    .catch(err => alert('Error saving gig'));
+}
+
+function markApplied(gigId) {
+  fetch('/gigs/status/' + gigId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'applied' })
+  })
+  .then(r => r.json())
+  .then(data => {
+    alert('Marked as applied! 🎉');
+  })
+  .catch(err => alert('Error updating status'));
+}
+</script>
+
+<%- include('../partials/footer') %>
